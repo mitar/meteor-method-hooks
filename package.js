@@ -1,21 +1,19 @@
 Package.describe({
-  summary: 'Provides before/after hooks for Meteor methods',
-  version: '1.1.0',
-  name: 'hitchcott:method-hooks',
-  git: 'https://github.com/hitchcott/meteor-method-hooks'
+    summary: 'Run functions before and after methods, inspect arguments and modify return values. Works with builtin Meteor methods.',
+    version: '2.0.0',
+    name: 'doctorpangloss:method-hooks',
+    git: 'https://github.com/workpop/meteor-method-hooks'
 });
 
 Package.on_use(function (api) {
-  if(api.versionsFrom) {
-    api.versionsFrom('METEOR@0.9.0');
-  }
+    api.versionsFrom('METEOR@1.0');
+    api.addFiles('method-hooks.js');
+    api.export('MethodHooks');
+});
 
-  api.use([
-    'coffeescript'
-  ], ['server']);
-
-  api.add_files([
-    'method-hooks.coffee'
-  ], ['server']);
-
+Package.onTest(function (api) {
+    api.use(['meteor', 'webapp', 'tinytest']);
+    api.addFiles('method-hooks.js');
+    api.addFiles('meteor-hooks-tests.js');
+    api.export('MethodHooks');
 });

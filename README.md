@@ -1,75 +1,87 @@
 # Meteor Method Hooks
-### Before/after hooks for Meteor methods
 
-| Meteor >= 0.9  | Meteor < 0.9  |
-|---|---|
-|  `meteor add hitchcott:method-hooks`  |  `mrt add method-hooks` |
+A hook is a function you run before or after a method on the server.
 
+It accepts a single argument, `options`, an objecting with three properties:
 
-This server-only package extends Meteor with two methods:
-* `Meteor.beforeMethods` 
-* `Meteor.afterMethods`
+ - `result`: The result of the method being hooked. This is `undefined` in before hooks.
+ - `error`: An error, if any, of the method being hooked. This is `undefined` in before hooks.
+ - `arguments`: A raw arguments object whose type is `arguments`.
+ 
+```
+/**
+ A hook to be run before or after a method.
+ @name Hook
+ @function
+ @param {{result: *, error: *, arguments: Array, hooksProcessed: Number}}
+ @return {*} The result of the method
+  An options parameter that has the result and error from calling the method
+  and the arguments used to call that method. `result` and `error` are null
+  for before hooks, since the method has not yet been called. On the client,
+  after hooks are called when the method returns from the server, but before
+  the callback is invoked. `hooksProcessed` gives you the number of hooks
+  processed so far, since previous hooks may have mutated the arguments.
 
-The `beforeMethods` method can be used for securing `Meteor.methods` based on the result of a definable function.
-
-Here's an example for security, in `/server/methods.coffee`
-
-```coffeescript
-Meteor.beforeMethods 'test', ->
-  Meteor.users.findOne(@userId)?.admin
+  After hooks can change the result values. Use `hooksProcessed` to keep
+  track of how many modifications have been made.
+ */
+ 
+function hook(options) {
+   console.log('arguments', options.arguments);
+   console.log('error', options.error);
+   console.log('result', options.result);
+   console.log('hooks processed', options.hooksProcessed);
+   // To be safe, return the options.result
+   return options.result;
+}
 ```
 
-The above will prevent the `test` method from being executed unless the client is logged in as and has their `admin` field set to `true`. 
+Hooks are called in the following order:
 
-Any `beforeMethods` that return `false` will stop the relevent method and any other hooks from executing.
+ - **Before** hooks.
+ - The method body.
+ - **After** hooks, regardless of whether or not the method body threw an error.
+ - Callbacks, if any.
+ 
+### Examples
 
-Uses include:
+```js
+// Pass a method name and a hook function
+MeteorHooks.before('login', function(options) {
+  // Lowercase the email
+  var loginOptions = options.arguments[0];
+  if (loginOptions.email) {
+    loginOptions.email = (loginOptions.email || '').toLowerCase();
+  }
+});
 
-* Security
-* Logging
-* [insert imaginative idea]
+MethodHooks.afterMethods({
+  resetPassword: function(options) {
+    // If the reset password failed, do nothing
+    if (options.error) {
+      return;
+    }
 
-## Example Usage
+    // Get a redacted version of the token used to reset the password
+    var redactedToken = options.arguments[0].slice(0,4) + '***********************************************'
 
-You can pass an array of method names, and the hooks will recieve the same parameters as the original method. For example:
+    // Update the user whose password with a reset record
+    var userId = options.result.userId;
+    Meteor.users.update(userId,
+      {$addToSet: {'security.log': {method: 'resetPassword', at: new Date(), token: redactedToken}}});
 
-```coffeescript
-if Meteor.isServer
-  Meteor.methods
-    'test1' : (str) -> console.log 'Hi', str
-    'test2' : -> console.log 'second method'
+    // The result can be mutated here. Let's note that it has been logged to the client
+    options.result.logged = true;
 
-  Meteor.beforeMethods ['test1','test2'], (str) ->
-    console.log 'hook1', str
-
-  Meteor.beforeMethods 'test1', ->
-    console.log 'hook2'
-
-  Meteor.afterMethods 'test2', ->
-    console.log 'hook3'
-
-if Meteor.isClient
-  Meteor.call 'test1', 'Chris'
-  Meteor.call 'test2'
+    // We do not have to return the result here. You cannot modify the return value, since other after functions may
+    // overwrite it
+  }
+});
 ```
 
-will output
+Caution: Using this package on the client is strictly experimental until tests are written.
 
-```
-hook1 Chris
-hook2
-Hi Chris
-hook1 undefined
-second method
-hook3
-```
-
-## TODO
-
-* Testing
-* `beforeAllMethods` & `afterAllMethods` ?
-* Hook up methods instantly (if they exist) rather than waiting for startup, and defer any unmatched hooks until *after* `Meteor.startup`.
 
 ## Credits
 
-[Chris Hitchcott](http://github.com/hitchcott), 2014
+Original Concept: [Chris Hitchcott](http://github.com/hitchcott), 2014
