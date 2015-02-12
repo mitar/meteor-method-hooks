@@ -68,8 +68,7 @@ MethodHooks.afterMethods({
     }
 
     // Get a redacted version of the token used to reset the password
-    var redactedToken = options.arguments[0].slice(0,4) + '***********************************************'
-
+    var redactedToken = 'Starting with ' + options.arguments[0].slice(0,4);
     // Update the user whose password with a reset record
     var userId = options.result.userId;
     Meteor.users.update(userId,
