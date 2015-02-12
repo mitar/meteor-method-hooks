@@ -1,12 +1,17 @@
 # Meteor Method Hooks
 
+Use this package to run functions before and after methods, including Meteor builtin methods like login and reset password. It supports a simple API that has tests for the server. Client features are experimental.
+
+### Documentation
+
 A hook is a function you run before or after a method on the server.
 
-It accepts a single argument, `options`, an objecting with three properties:
+It accepts a single argument, `options`, an object with four properties:
 
  - `result`: The result of the method being hooked. This is `undefined` in before hooks.
  - `error`: An error, if any, of the method being hooked. This is `undefined` in before hooks.
  - `arguments`: A raw arguments object whose type is `arguments`.
+ - `hooksProcessed`: A count of the hooks that have been processed so far. This also corresponds to the index in the array of hooks for a method.
  
 ```
 /**
