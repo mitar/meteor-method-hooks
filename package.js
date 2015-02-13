@@ -1,6 +1,6 @@
 Package.describe({
     summary: 'Run functions before and after methods, mutate arguments and return values.',
-    version: '2.0.1',
+    version: '2.0.2',
     name: 'doctorpangloss:method-hooks',
     git: 'https://github.com/workpop/meteor-method-hooks'
 });

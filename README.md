@@ -8,11 +8,13 @@ A hook is a function you run before or after a method on the server.
 
 It accepts a single argument, `options`, an object with four properties:
 
- - `result`: The result of the method being hooked. This is `undefined` in before hooks.
+ - `result`: The result of the method being hooked. This is `undefined` in before hooks. This is mutable.
  - `error`: An error, if any, of the method being hooked. This is `undefined` in before hooks.
- - `arguments`: A raw arguments object whose type is `arguments`.
+ - `arguments`: An array of `arguments`, i.e., `_.toArray(arguments)`. This is mutable.
  - `hooksProcessed`: A count of the hooks that have been processed so far. This also corresponds to the index in the array of hooks for a method.
- 
+
+An after hook should return `options.result` or a new result, which will be return as the result of the method. It will also be available to subsequent methods.
+
 ```
 /**
  A hook to be run before or after a method.
