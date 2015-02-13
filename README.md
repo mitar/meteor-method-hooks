@@ -62,6 +62,37 @@ MeteorHooks.before('login', function(options) {
   }
 });
 
+// Throw inside befores to prevent methods from being run
+MeteorHooks.before('doctorpangloss:admin/admin', function(options) {
+  // Maybe you don't know that my admin package supports authentication already. Do it here
+  // `this` corresponds to the method's conventional `this`
+  var userId = this.userId;
+  var user = Meteor.users.findOne(userId,
+    // Try to always specify the fields you need. Best practices :)
+    {fields: {role}});
+    
+  if (user && user.role == 'admin') {
+    return
+  }
+  
+  // Since the role is not admin, or the user wasn't found, throw.
+  // This wil short-circuit the method
+  throw new Meteor.Error(403, 'Permission denied.');
+});
+
+// Meteor.after to call after
+MeteorHooks.after('users/update', function(options) {
+  // We want to track user updates in analytics
+  var update = options.argument[1];
+  // Cleverly, we set the event parameters to be whatever the user set.
+  var parameters = update['$set'];
+  Analytics.track(this.userId, 'User Update', parameters);
+  // Return the result
+  return options.result;
+});
+
+// You can also pass a dictionary of Objection.<String, Hook> like typical Meteor.methods.
+// The two functions are `MethodHooks.beforeMethods` and `MeteorHooks.afterMethods`.
 MethodHooks.afterMethods({
   resetPassword: function(options) {
     // If the reset password failed, do nothing
