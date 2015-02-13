@@ -8,7 +8,7 @@ callback-hook@1.0.2
 check@1.0.4
 ddp@1.0.14
 deps@1.0.6
-doctorpangloss:method-hooks@2.0.1
+doctorpangloss:method-hooks@2.0.2
 ejson@1.0.5
 follower-livedata@1.0.3
 geojson-utils@1.0.2
@@ -17,7 +17,7 @@ htmljs@1.0.3
 id-map@1.0.2
 jquery@1.11.3
 json@1.0.2
-local-test:doctorpangloss:method-hooks@2.0.1
+local-test:doctorpangloss:method-hooks@2.0.2
 logging@1.0.6
 meteor@1.1.4
 minifiers@1.1.3
