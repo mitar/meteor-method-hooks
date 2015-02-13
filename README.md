@@ -63,6 +63,7 @@ MeteorHooks.before('login', function(options) {
 MethodHooks.afterMethods({
   resetPassword: function(options) {
     // If the reset password failed, do nothing
+    // The hook will run even if the method threw an error, so you must always check for an error
     if (options.error) {
       return;
     }
@@ -77,8 +78,8 @@ MethodHooks.afterMethods({
     // The result can be mutated here. Let's note that it has been logged to the client
     options.result.logged = true;
 
-    // We do not have to return the result here. You cannot modify the return value, since other after functions may
-    // overwrite it
+    // You should return the result at the end of an after. You will receive a warning if a result was expected.
+    return options.result;
   }
 });
 ```
