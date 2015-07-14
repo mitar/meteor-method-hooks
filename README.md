@@ -54,7 +54,7 @@ Hooks are called in the following order:
 
 ```js
 // Pass a method name and a hook function
-MeteorHooks.before('login', function(options) {
+MethodHooks.before('login', function(options) {
   // Lowercase the email
   var loginOptions = options.arguments[0];
   if (loginOptions.email) {
@@ -63,7 +63,7 @@ MeteorHooks.before('login', function(options) {
 });
 
 // Throw inside befores to prevent methods from being run
-MeteorHooks.before('doctorpangloss:admin/admin', function(options) {
+MethodHooks.before('doctorpangloss:admin/admin', function(options) {
   // Maybe you don't know that my admin package supports authentication already. Do it here
   // `this` corresponds to the method's conventional `this`
   var userId = this.userId;
@@ -81,7 +81,7 @@ MeteorHooks.before('doctorpangloss:admin/admin', function(options) {
 });
 
 // Meteor.after to call after
-MeteorHooks.after('users/update', function(options) {
+MethodHooks.after('users/update', function(options) {
   // We want to track user updates in analytics
   var update = options.argument[1];
   // Cleverly, we set the event parameters to be whatever the user set.
@@ -92,7 +92,7 @@ MeteorHooks.after('users/update', function(options) {
 });
 
 // You can also pass a dictionary of Objection.<String, Hook> like typical Meteor.methods.
-// The two functions are `MethodHooks.beforeMethods` and `MeteorHooks.afterMethods`.
+// The two functions are `MethodHooks.beforeMethods` and `MethodHooks.afterMethods`.
 MethodHooks.afterMethods({
   resetPassword: function(options) {
     // If the reset password failed, do nothing
