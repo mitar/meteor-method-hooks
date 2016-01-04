@@ -123,7 +123,7 @@ MethodHooks.afterMethods({
 * for example methodName here is 'Collection.update'
 */
 MethodHooks.beforeMethods({
-  findDocument: function (options) {
+  Students.update: function (options) {
     // Get the collection name from options
     var collection = options.methodName.split('.')[0];
     // Get ID from options
