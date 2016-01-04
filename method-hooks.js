@@ -81,7 +81,8 @@ MethodHooks._initializeHook = function (mapping, methodName, hookFunction) {
                 result: undefined,
                 error: undefined,
                 arguments: args,
-                hooksProcessed: hooksProcessed
+                hooksProcessed: hooksProcessed,
+                methodName: methodName
             });
         });
 
@@ -102,7 +103,8 @@ MethodHooks._initializeHook = function (mapping, methodName, hookFunction) {
                 result: methodResult,
                 error: methodError,
                 arguments: args,
-                hooksProcessed: hooksProcessed
+                hooksProcessed: hooksProcessed,
+                methodName: methodName
             });
             // If the after hook did not return a value and the methodResult is not undefined, warn and fix
             if (_.isUndefined(hookResult)
