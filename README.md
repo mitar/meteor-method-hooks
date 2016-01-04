@@ -12,6 +12,7 @@ It accepts a single argument, `options`, an object with four properties:
  - `error`: An error, if any, of the method being hooked. This is `undefined` in before hooks.
  - `arguments`: An array of `arguments`, i.e., `_.toArray(arguments)`. This is mutable.
  - `hooksProcessed`: A count of the hooks that have been processed so far. This also corresponds to the index in the array of hooks for a method.
+ - `methodName`: The name of the method being hooked.
 
 An after hook should return `options.result` or a new result, which will be return as the result of the method. It will also be available to subsequent methods.
 
@@ -20,7 +21,7 @@ An after hook should return `options.result` or a new result, which will be retu
  A hook to be run before or after a method.
  @name Hook
  @function
- @param {{result: *, error: *, arguments: Array, hooksProcessed: Number}}
+ @param {{result: *, error: *, arguments: Array, hooksProcessed: Number, methodName: String}}
  @return {*} The result of the method
   An options parameter that has the result and error from calling the method
   and the arguments used to call that method. `result` and `error` are null
@@ -38,6 +39,7 @@ function hook(options) {
    console.log('error', options.error);
    console.log('result', options.result);
    console.log('hooks processed', options.hooksProcessed);
+   console.log('method name', options.methodName);
    // To be safe, return the options.result
    return options.result;
 }
@@ -113,6 +115,26 @@ MethodHooks.afterMethods({
 
     // You should return the result at the end of an after. You will receive a warning if a result was expected.
     return options.result;
+  }
+});
+
+/*
+* Query a collection based on the methodName property of options
+* for example methodName here is 'Collection.update'
+*/
+MethodHooks.beforeMethods({
+  Students.update: function (options) {
+    // Get the collection name from options
+    var collection = options.methodName.split('.')[0];
+    // Get ID from options
+    var id = options.arguments[0];
+    // get collection
+    var result = eval(collection).findOne(id);
+    if (result) {
+      // push the document to arguments if found
+      return options.arguments.push(result);
+    }
+    throw new Meteor.Error(404, `${collection} isn't found`);
   }
 });
 ```
