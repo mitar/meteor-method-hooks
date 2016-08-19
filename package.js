@@ -12,7 +12,7 @@ Package.on_use(function (api) {
 });
 
 Package.onTest(function (api) {
-    api.use(['meteor', 'webapp', 'tinytest']);
+    api.use(['meteor', 'webapp', 'tinytest', 'underscore']);
     api.addFiles('method-hooks.js');
     api.addFiles('meteor-hooks-tests.js');
     api.export('MethodHooks');
